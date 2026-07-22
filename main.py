@@ -21,6 +21,12 @@ if not BOT_TOKEN or BOT_TOKEN == "YOUR_TELEGRAM_BOT_TOKEN_HERE":
     print("❌ HATA: 'BOT_TOKEN' bulunamadı veya varsayılan değerde bırakıldı.")
     sys.exit(1)
 
+# PythonAnywhere ortamında proxy yapılandırmasını otomatik uygula
+HTTP_PROXY = os.getenv("http_proxy") or os.getenv("HTTPS_PROXY")
+if HTTP_PROXY:
+    telebot.apihelper.proxy = {'http': HTTP_PROXY, 'https': HTTP_PROXY}
+    print(f"ℹ️ PythonAnywhere Proxy ayarlandı: {HTTP_PROXY}")
+
 bot = telebot.TeleBot(BOT_TOKEN)
 
 DEFAULT_CITY = "Kırklareli"
