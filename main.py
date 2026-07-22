@@ -32,32 +32,20 @@ if HTTP_PROXY:
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# PythonAnywhere üzerindeki geçici proxy hatalarına (503 Service Unavailable vb.) karşı otomatik yeniden deneme (Retry) mekanizması
-_original_reply_to = bot.reply_to
-_original_send_message = bot.send_message
+# Tüm API isteklerinde (başlangıç ve mesajlaşma) geçici proxy hatalarına karşı otomatik yeniden deneme (Retry) mekanizması
+_original_make_request = telebot.apihelper._make_request
 
-def safe_reply_to(message, text, **kwargs):
-    for i in range(3):
+def safe_make_request(*args, **kwargs):
+    for i in range(4):
         try:
-            return _original_reply_to(message, text, **kwargs)
+            return _original_make_request(*args, **kwargs)
         except Exception as e:
-            print(f"⚠️ Yanıt gönderilemedi, yeniden deneniyor ({i+1}/3)... Hata: {e}")
-            if i < 2:
-                time.sleep(1.5)
+            print(f"⚠️ Telegram API bağlantı hatası, yeniden deneniyor ({i+1}/4)... Hata: {e}")
+            if i < 3:
+                time.sleep(2)
     raise e
 
-def safe_send_message(chat_id, text, **kwargs):
-    for i in range(3):
-        try:
-            return _original_send_message(chat_id, text, **kwargs)
-        except Exception as e:
-            print(f"⚠️ Mesaj gönderilemedi, yeniden deneniyor ({i+1}/3)... Hata: {e}")
-            if i < 2:
-                time.sleep(1.5)
-    raise e
-
-bot.reply_to = safe_reply_to
-bot.send_message = safe_send_message
+telebot.apihelper._make_request = safe_make_request
 
 DEFAULT_CITY = "Kırklareli"
 SUBSCRIBERS_FILE = "subscribers.json"
