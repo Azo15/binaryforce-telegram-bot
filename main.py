@@ -29,6 +29,33 @@ if HTTP_PROXY:
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+# PythonAnywhere üzerindeki geçici proxy hatalarına (503 Service Unavailable vb.) karşı otomatik yeniden deneme (Retry) mekanizması
+_original_reply_to = bot.reply_to
+_original_send_message = bot.send_message
+
+def safe_reply_to(message, text, **kwargs):
+    for i in range(3):
+        try:
+            return _original_reply_to(message, text, **kwargs)
+        except Exception as e:
+            print(f"⚠️ Yanıt gönderilemedi, yeniden deneniyor ({i+1}/3)... Hata: {e}")
+            if i < 2:
+                time.sleep(1.5)
+    raise e
+
+def safe_send_message(chat_id, text, **kwargs):
+    for i in range(3):
+        try:
+            return _original_send_message(chat_id, text, **kwargs)
+        except Exception as e:
+            print(f"⚠️ Mesaj gönderilemedi, yeniden deneniyor ({i+1}/3)... Hata: {e}")
+            if i < 2:
+                time.sleep(1.5)
+    raise e
+
+bot.reply_to = safe_reply_to
+bot.send_message = safe_send_message
+
 DEFAULT_CITY = "Kırklareli"
 SUBSCRIBERS_FILE = "subscribers.json"
 sent_reminders = set()  # Bugün gönderilen hatırlatmaların takibi (Örn: "2026-07-21_İkindi")
