@@ -3,10 +3,13 @@ import sys
 import json
 import time
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import requests
 import telebot
 from dotenv import load_dotenv
+
+# Türkiye Saat Dilimi (UTC+3)
+TR_TZ = timezone(timedelta(hours=3))
 
 # Windows konsolunda Unicode/Emoji çıktı hatasını önlemek için stdout kodlamasını ayarla
 if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
@@ -141,7 +144,7 @@ def get_date_info():
     """
     Güncel tarih, gün ve saat bilgisini Türkçe biçimlendirir.
     """
-    now = datetime.now()
+    now = datetime.now(TR_TZ)
     months = [
         "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
         "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
@@ -174,7 +177,7 @@ def start_reminder_scheduler():
         global sent_reminders
         while True:
             try:
-                now = datetime.now()
+                now = datetime.now(TR_TZ)
                 today_str = now.strftime("%Y-%m-%d")
                 current_time_str = now.strftime("%H:%M")
 
