@@ -76,5 +76,4 @@ Proje geliştirme sürecinde aşağıdaki Git Commit mesajları kullanılmışt�
 
 ---
 
-## 📄 Lisans
-Bu proje MIT Lisansı ile lisanslanmıştır.
+
